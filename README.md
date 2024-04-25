@@ -7,7 +7,7 @@ An algorithm that statistically calculate the retrieval score of attention heads
 A Single 80G GPU is enough to detect up to 50K length.
 ### Usage :
 ```python
-python retrieval_head_detection.py  --model_path $path_to_model --s 0 --e 50000
+python retrieval_head_detection.py  --model_path $path_to_model --s 1000 --e 50000
 ```
 **Currently Implemented Model Families**: 
 LLama([Llama-2-7B-80K](https://huggingface.co/yaofu/llama-2-7b-80k)), Yi, Qwen, Mistrial
