@@ -17,7 +17,7 @@ All detection results are saved in "./head_score/*.json", where each head is sav
 ```python
 {layer-head_id: [list of retrieval scores across detections]}
 ```
-**Directly load a results for Analysis**
+**No more talking, just show me all the retrieval Heads !**
 ```python
 ## load head score file, llama-2-7b-80k for example
 with open('./head_score/llama-2-7b-80k.json') as file:
