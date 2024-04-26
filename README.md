@@ -60,7 +60,7 @@ python needle_in_haystack_with_mask.py --mask_top 30 --s 1000 --e 100000  --mode
 python needle_in_haystack_with_mask.py --mask_top -30 --s 1000 --e 100000  --model_path $path_to_model  #Results of  will be written in './results/graph/llama-2-7b-80k_block_random30'
 ```
 ### Reulsts and Visualization:
-Replace 'model_name' in 'retrieval_head_opensource/viz/CreateVizFromLLMTesting.ipynb' by the folder name of Needle-in-a-Haystack results.
+Replace 'model_name' in './viz/CreateVizFromLLMTesting.ipynb' by the folder name of Needle-in-a-Haystack results.
 
 **Mask top 30 Retrieval Head for Llama-2-7b-80K**:
 ![alt text](viz/top30.png)
