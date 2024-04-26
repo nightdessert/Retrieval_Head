@@ -65,4 +65,4 @@ Replace 'model_name' in 'retrieval_head_opensource/viz/CreateVizFromLLMTesting.i
 **Mask top 30 Retrieval Head for Llama-2-7b-80K**:
 ![alt text](viz/top30.png)
 **Mask random 30 non-Retrieval Head for Llama-2-7b-80K**:
-![alt text](viz/random30.png)
+![alt text](viz/random.png)
