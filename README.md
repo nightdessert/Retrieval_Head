@@ -56,8 +56,8 @@ A Single 80G GPU can test up to ~70K length, 2*80G GPU can test up to 100K lengt
 
 Masking top 30 retrieval heads vs 30 random heads:
 ```python
-python needle_in_haystack_with_mask.py --model_path ~/models/llama-2-7b-80k --s 1000 --e 100000 --mask_top 30 #Results of  will be written in './results/graph/llama-2-7b-80k_block_top30'
-python needle_in_haystack_with_mask.py --model_path ~/models/llama-2-7b-80k --s 1000 --e 100000 --mask_top -30 #Results of  will be written in './results/graph/llama-2-7b-80k_block_random30'
+python needle_in_haystack_with_mask.py --mask_top 30 --s 1000 --e 100000  --model_path $path_to_model  #Results of  will be written in './results/graph/llama-2-7b-80k_block_top30'
+python needle_in_haystack_with_mask.py --mask_top -30 --s 1000 --e 100000  --model_path $path_to_model  #Results of  will be written in './results/graph/llama-2-7b-80k_block_random30'
 ```
 ### Reulsts and Visualization:
 Replace 'model_name' in 'retrieval_head_opensource/viz/CreateVizFromLLMTesting.ipynb' by the folder name of Needle-in-a-Haystack results.
