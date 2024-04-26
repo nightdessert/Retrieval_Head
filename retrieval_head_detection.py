@@ -289,6 +289,7 @@ class LLMNeedleHaystackTester:
         test_elapsed_time = test_end_time - test_start_time
         
         score = scorer.score(self.real_needle, response)['rouge1'].recall*100
+        ## if recall > 50, we determine this retrieval succeed and update the retrieval score
         if score > 50:
             self.retrieval_head_accumulate(retrieval_score)
             head_score = [(i[0], np.mean(i[1])) for i in self.head_counter.items()]
