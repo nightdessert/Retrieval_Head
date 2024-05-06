@@ -32,13 +32,15 @@ All detection results are saved in "./head_score/*.json", where each head is sav
 **Directly load a results for Analysis**
 ```python
 ## load head score file, llama-2-7b-80k for example
-with open('./head_score/llama-2-7b-80k.json'):
+import json
+import numpy as np
+with open('./head_score/llama-2-7b-80k.json') as file:
     head_list = json.loads(file.readline())
 ## use the average retrieval score and ranking
-head_score_list = [([int(ll) for ll in l[0].split("-"), np.mean(l[1])) for l in head_list.items()]
+head_score_list = [([int(ll) for ll in l[0].split("-")],np.mean(l[1])) for l in head_list.items()]
 head_score_list = sorted(head_score_list, key=lambda x: x[1], reverse=True) 
-top_retrieval_heads = [l[0],  round(np.mean(l[1]), 2)]] for l in head_score_list][:10]
-print(top_retrieval_head)
+top_retrieval_heads = [[l[0],  round(np.mean(l[1]), 2)] for l in head_score_list][:10]
+print(top_retrieval_heads)
 '''
 Head:[16, 19],   Retrieval Score: 0.94      Head:[11, 15],   Retrieval Score: 0.92      
 Head:[8, 26],    Retrieval Score: 0.8       Head:[6, 9],     Retrieval Score: 0.62        
