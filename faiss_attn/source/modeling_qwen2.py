@@ -1107,6 +1107,7 @@ class Qwen2Model(Qwen2PreTrainedModel):
         output_attentions: Optional[bool] = None,
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
+        block_list: list = None,
     ) -> Union[Tuple, BaseModelOutputWithPast]:
         output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
         output_hidden_states = (
@@ -1190,7 +1191,11 @@ class Qwen2Model(Qwen2PreTrainedModel):
         all_hidden_states = () if output_hidden_states else None
         all_self_attns = () if output_attentions else None
         next_decoder_cache = None
-
+        if block_list:
+            kwargs={"block_list":block_list}
+        else:
+            kwargs={}
+        #print(block_list)
         for decoder_layer in self.layers:
             if output_hidden_states:
                 all_hidden_states += (hidden_states,)
@@ -1214,6 +1219,7 @@ class Qwen2Model(Qwen2PreTrainedModel):
                     output_attentions=output_attentions,
                     use_cache=use_cache,
                     attn_mode=attn_mode,
+                    **kwargs,
                 )
 
             hidden_states = layer_outputs[0]
@@ -1289,6 +1295,7 @@ class Qwen2ForCausalLM(Qwen2PreTrainedModel):
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
         attn_mode: str = "flash",
+        block_list:list = None, 
     ) -> Union[Tuple, CausalLMOutputWithPast]:
         r"""
         Args:
@@ -1334,6 +1341,7 @@ class Qwen2ForCausalLM(Qwen2PreTrainedModel):
             output_hidden_states=output_hidden_states,
             return_dict=return_dict,
             attn_mode=attn_mode,
+            block_list=block_list,
         )
 
         hidden_states = outputs[0]
