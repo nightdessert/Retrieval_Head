@@ -45,6 +45,7 @@ from source.modeling_llama import LlamaForCausalLM, LlamaConfig
 from source.modeling_qwen2 import Qwen2ForCausalLM
 from source.modeling_mixtral import MixtralForCausalLM
 from source.modeling_mistral import MistralForCausalLM
+from source.modeling_phi3 import Phi3ForCausalLM
 
 import numpy as np
 import argparse
@@ -184,6 +185,10 @@ class LLMNeedleHaystackTester:
                     )
             elif "Mistral" in self.model_version:
                 self.model_to_test = MistralForCausalLM.from_pretrained(
+                       model_name,torch_dtype="auto",device_map='auto',use_flash_attention_2="flash_attention_2",trust_remote_code=True,
+                    )
+            elif "Phi3" in self.model_version:
+                self.model_to_test = Phi3ForCausalLM.from_pretrained(
                        model_name,torch_dtype="auto",device_map='auto',use_flash_attention_2="flash_attention_2",trust_remote_code=True,
                     )
             else:
@@ -544,7 +549,7 @@ if __name__ == "__main__":
     parser.add_argument('--model_name_suffix', type=str, default=None, help='name of model')
     parser.add_argument('--model_provider', type=str, default="LLaMA", help='which model to use')
     parser.add_argument('--api_key', type=str, default="", help='OpenAI API Key')
-    parser.add_argument('--mask_topk', type=int, default=0, help='OpenAI API Key')
+    parser.add_argument('--mask_topk', type=int, default=0, help='mask topk heads, input a negative value to mask random heads')
     # parser = add_args(parser)
     args = parser.parse_args()
 
@@ -559,7 +564,9 @@ if __name__ == "__main__":
                                  model_provider=args.model_provider,
                                  save_contexts=True,
                                  save_results=True,
-                                 mask_topk=args.mask_topk
+                                 mask_topk=args.mask_topk,
+                                context_lengths_min=args.s_len,
+                                context_lengths_max=args.e_len,
                                  )
 
     ht.start_test(args)
