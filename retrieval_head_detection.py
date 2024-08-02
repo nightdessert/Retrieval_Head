@@ -44,6 +44,7 @@ from source.modeling_llama import LlamaForCausalLM
 from source.modeling_qwen2 import Qwen2ForCausalLM
 from source.modeling_mixtral import MixtralForCausalLM
 from source.modeling_mistral import MistralForCausalLM
+from source.modeling_phi3 import Phi3ForCausalLM
 import numpy as np
 import argparse
 from rouge_score import rouge_scorer
@@ -174,6 +175,10 @@ class LLMNeedleHaystackTester:
                 ).eval()
         elif "Mistral" in self.model_version:
             self.model_to_test = MistralForCausalLM.from_pretrained(
+                    model_name,torch_dtype="auto",device_map='auto',use_flash_attention_2="flash_attention_2",trust_remote_code=True,
+                ).eval()
+        elif "Phi3" in self.model_version:
+            self.model_to_test = Phi3ForCausalLM.from_pretrained(
                     model_name,torch_dtype="auto",device_map='auto',use_flash_attention_2="flash_attention_2",trust_remote_code=True,
                 ).eval()
         else:
@@ -525,6 +530,8 @@ if __name__ == "__main__":
                                  model_provider=args.model_provider,
                                  save_contexts=True,
                                  save_results=True,
+                                 context_lengths_min=args.s_len,
+                                 context_lengths_max=args.e_len,
                                  )
 
     ht.start_test(args)
