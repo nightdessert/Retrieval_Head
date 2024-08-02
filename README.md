@@ -3,6 +3,7 @@ This is the open-source code for paper:
 *[Retrieval Head Mechanistically Explains Long-Context Factuality](https://arxiv.org/abs/2404.15574)*. 
 
 This code is implemented based on *[Needle In a HayStack](https://github.com/gkamradt/LLMTest_NeedleInAHaystack/tree/main)*.
+【Update】 Support Phi3 now, thanks to the contribution made by @Wangmerlyn.
 ## Retrieval Head Detection
 An algorithm that statistically calculate the retrieval score of attention heads in a transformer model.
 Because FlashAttention can not return attention matrix, this algorithm is implemented by first caching with FlashAttention and apply normal attention for decoding. 
