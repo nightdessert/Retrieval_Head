@@ -216,6 +216,12 @@ class LLMNeedleHaystackTester:
         for context_length in self.context_lengths:
             if context_length < args.s_len or context_length > args.e_len: continue
             for depth_percent in self.document_depth_percents:
+                # Check if result already exists, if so skip this test
+                if self.result_exists(context_length, depth_percent):
+                    if self.print_ongoing_status:
+                        print(f"Skipping context_length={context_length}, depth_percent={depth_percent}% - Result already exists")
+                    continue
+                    
                 task = self.bound_evaluate_and_log(context_length, depth_percent)
 
     def retrieval_calculate(self, attention_maxtrix,retrieval_score, inp, step_token,topk=1):
@@ -326,7 +332,7 @@ class LLMNeedleHaystackTester:
         context_file_location = f'{self.model_version.replace(".", "_")}_len_{context_length}_depth_{int(depth_percent*100)}'
 
         if self.save_contexts:
-            results['file_name'] : context_file_location
+            results['file_name'] = context_file_location
 
             # Save the context to file for retesting
             if not os.path.exists('contexts'):
@@ -354,7 +360,7 @@ class LLMNeedleHaystackTester:
         Checks to see if a result has already been evaluated or not
         """
 
-        results_dir = 'results/' + self.model_version
+        results_dir = f'results/graph/{self.model_version}'
         print("Searching existing results at %s" % results_dir)
         if not os.path.exists(results_dir):
             return False
