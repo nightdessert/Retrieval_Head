@@ -37,6 +37,8 @@ python -u needle_in_haystack.py --s_len 0 --e_len 128000\
 import os 
 import glob
 import json
+import re
+from functools import cache
 from transformers import AutoTokenizer, AutoModel, AutoModelForCausalLM, AutoConfig
 import sys
 sys.path.append("./faiss_attn/")
@@ -247,16 +249,58 @@ class LLMNeedleHaystackTester:
         return output, retrieval_score 
 
     def find_needle_idx(self, needle):
-        needle_ids = self.enc(needle, add_special_tokens=False)["input_ids"]
-        print( self.enc.decode(needle_ids, skip_special_tokens=False))
-        span_len = len(needle_ids)
-        for i in range(len(self.prompt_ids)):            
-            token_span = self.prompt_ids[i : i + span_len]
-            span_ids = set(token_span.tolist())
-            overlap = float(len(span_ids.intersection(set(needle_ids)))) / len(set(needle_ids))
-            if(overlap > 0.9):
-                return i, i + span_len
-        return -1, -1
+        """Return the half-open answer span in the original prompt token sequence."""
+        ids = self.prompt_ids.tolist()
+        decoded = self.enc.decode(
+            ids, skip_special_tokens=True, clean_up_tokenization_spaces=False
+        )
+        assert decoded.count(self.needle) == 1, "the inserted needle must occur once"
+        # The released answer capitalizes "Because" where the sentence uses "because".
+        (answer_match,) = re.finditer(re.escape(needle), self.needle, re.IGNORECASE)
+        estimate = len(
+            self.enc.encode(decoded[:decoded.index(self.needle)], add_special_tokens=False)
+        )
+        radius = len(self.enc.encode(self.needle, add_special_tokens=False))
+        while True:
+            lower, upper = max(0, estimate - radius), min(len(ids), estimate + radius)
+            local_ids = ids[lower:upper]
+            decoded = self.enc.decode(
+                local_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False
+            )
+            if self.needle in decoded:
+                assert decoded.count(self.needle) == 1
+                break
+            assert lower > 0 or upper < len(ids), "needle absent from decoded tokens"
+            radius *= 2
+        begin = decoded.index(self.needle) + answer_match.start()
+        finish = decoded.index(self.needle) + answer_match.end()
+
+        @cache
+        def prefix(stop):
+            return self.enc.decode(
+                local_ids[:stop], skip_special_tokens=True, clean_up_tokenization_spaces=False
+            )
+
+        start = min(
+            len(local_ids) - 1,
+            len(self.enc.encode(decoded[:begin], add_special_tokens=False)),
+        )
+        while start > 0 and len(prefix(start)) > begin:
+            start -= 1
+        while start < len(local_ids) - 1 and len(prefix(start + 1)) <= begin:
+            start += 1
+        end = min(
+            len(local_ids), len(self.enc.encode(decoded[:finish], add_special_tokens=False))
+        )
+        while end < len(local_ids) and len(prefix(end)) < finish:
+            end += 1
+        while end > start + 1 and len(prefix(end - 1)) >= finish:
+            end -= 1
+        for stop in {start, start + 1, end - 1, end}:
+            assert decoded.startswith(prefix(stop)), "decoded token prefixes disagree"
+        assert len(prefix(start)) <= begin < len(prefix(start + 1))
+        assert len(prefix(end - 1)) < finish <= len(prefix(end))
+        return lower + start, lower + end
 
     def evaluate_and_log(self, context_length, depth_percent):
         # Checks to see if you've already checked a length/percent/version.
